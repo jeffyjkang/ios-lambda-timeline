@@ -11,29 +11,20 @@ import Photos
 
 class ImagePostViewController: ShiftableViewController {
     
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var titleTextField: UITextField!
+    @IBOutlet weak var chooseImageButton: UIButton!
+    @IBOutlet weak var imageHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var postButton: UIBarButtonItem!
+    
+    var postController: PostController!
+    var post: Post?
+    var imageData: Data?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setImageViewHeight(with: 1.0)
-        
-        updateViews()
-    }
-    
-    func updateViews() {
-        
-        guard let imageData = imageData,
-            let image = UIImage(data: imageData) else {
-                title = "New Post"
-                return
-        }
-        
-        title = post?.title
-        
-        setImageViewHeight(with: image.ratio)
-        
-        imageView.image = image
-        
-        chooseImageButton.setTitle("", for: [])
     }
     
     private func presentImagePickerController() {
@@ -44,11 +35,9 @@ class ImagePostViewController: ShiftableViewController {
         }
         
         let imagePicker = UIImagePickerController()
-        
         imagePicker.delegate = self
-        
         imagePicker.sourceType = .photoLibrary
-
+        
         present(imagePicker, animated: true, completion: nil)
     }
     
@@ -56,24 +45,15 @@ class ImagePostViewController: ShiftableViewController {
         
         view.endEditing(true)
         
-        guard let imageData = imageView.image?.jpegData(compressionQuality: 0.1),
+        guard let image = imageView.image,
             let title = titleTextField.text, title != "" else {
-            presentInformationalAlertController(title: "Uh-oh", message: "Make sure that you add a photo and a caption before posting.")
-            return
-        }
-        
-        postController.createPost(with: title, ofType: .image, mediaData: imageData, ratio: imageView.image?.ratio) { (success) in
-            guard success else {
-                DispatchQueue.main.async {
-                    self.presentInformationalAlertController(title: "Error", message: "Unable to create post. Try again.")
-                }
+                presentInformationalAlertController(title: "Uh-oh", message: "Make sure that you add a photo and a caption before posting.")
                 return
-            }
-            
-            DispatchQueue.main.async {
-                self.navigationController?.popViewController(animated: true)
-            }
         }
+
+        postController.createImagePost(with: title, image: image, ratio: image.ratio)
+        
+        navigationController?.popViewController(animated: true)
     }
     
     @IBAction func chooseImage(_ sender: Any) {
@@ -100,11 +80,14 @@ class ImagePostViewController: ShiftableViewController {
             self.presentInformationalAlertController(title: "Error", message: "In order to access the photo library, you must allow this application access to it.")
         case .restricted:
             self.presentInformationalAlertController(title: "Error", message: "Unable to access the photo library. Your device's restrictions do not allow access.")
-            
-        @unknown default:
-            print("FatalError")
+        default:
+            break
         }
         presentImagePickerController()
+    }
+    
+    @IBAction func addFilter(_ sender: Any) {
+        
     }
     
     func setImageViewHeight(with aspectRatio: CGFloat) {
@@ -113,16 +96,6 @@ class ImagePostViewController: ShiftableViewController {
         
         view.layoutSubviews()
     }
-    
-    var postController: PostController!
-    var post: Post?
-    var imageData: Data?
-    
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var titleTextField: UITextField!
-    @IBOutlet weak var chooseImageButton: UIButton!
-    @IBOutlet weak var imageHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var postButton: UIBarButtonItem!
 }
 
 extension ImagePostViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {

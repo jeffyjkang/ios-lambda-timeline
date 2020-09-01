@@ -7,41 +7,27 @@
 //
 
 import Foundation
-import FirebaseAuth
 
-class Comment: FirebaseConvertible, Equatable {
+class Comment: Hashable {
     
     static private let textKey = "text"
-    static private let author = "author"
+    static private let authorKey = "author"
     static private let timestampKey = "timestamp"
     
-    let text: String
-    let author: Author
+    let text: String?
+    let author: String
     let timestamp: Date
     
-    init(text: String, author: Author, timestamp: Date = Date()) {
+    init(text: String? = nil, author: String, timestamp: Date = Date()) {
         self.text = text
         self.author = author
         self.timestamp = timestamp
     }
     
-    init?(dictionary: [String : Any]) {
-        guard let text = dictionary[Comment.textKey] as? String,
-            let authorDictionary = dictionary[Comment.author] as? [String: Any],
-            let author = Author(dictionary: authorDictionary),
-            let timestampTimeInterval = dictionary[Comment.timestampKey] as? TimeInterval else { return nil }
-        
-        self.text = text
-        self.author = author
-        self.timestamp = Date(timeIntervalSince1970: timestampTimeInterval)
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(timestamp.hashValue ^ author.hashValue)
     }
-    
-    var dictionaryRepresentation: [String: Any] {
-        return [Comment.textKey: text,
-                Comment.author: author.dictionaryRepresentation,
-                Comment.timestampKey: timestamp.timeIntervalSince1970]
-    }
-    
+
     static func ==(lhs: Comment, rhs: Comment) -> Bool {
         return lhs.author == rhs.author &&
             lhs.timestamp == rhs.timestamp

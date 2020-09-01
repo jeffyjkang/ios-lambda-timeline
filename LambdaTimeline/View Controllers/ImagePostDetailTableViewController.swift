@@ -10,6 +10,16 @@ import UIKit
 
 class ImagePostDetailTableViewController: UITableViewController {
     
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var authorLabel: UILabel!
+    @IBOutlet weak var imageViewAspectRatioConstraint: NSLayoutConstraint!
+    @IBOutlet weak var commentButton: UIBarButtonItem!
+    
+    var post: Post!
+    var postController: PostController!
+    var imageData: Data?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
@@ -17,15 +27,14 @@ class ImagePostDetailTableViewController: UITableViewController {
     
     func updateViews() {
         
-        guard let imageData = imageData,
-            let image = UIImage(data: imageData) else { return }
+        guard case MediaType.image(let image) = post.mediaType else { return }
         
         title = post?.title
         
         imageView.image = image
         
         titleLabel.text = post.title
-        authorLabel.text = post.author.displayName
+        authorLabel.text = post.author
     }
     
     // MARK: - Table view data source
@@ -70,19 +79,8 @@ class ImagePostDetailTableViewController: UITableViewController {
         let comment = post?.comments[indexPath.row + 1]
         
         cell.textLabel?.text = comment?.text
-        cell.detailTextLabel?.text = comment?.author.displayName
+        cell.detailTextLabel?.text = comment?.author
         
         return cell
     }
-    
-    var post: Post!
-    var postController: PostController!
-    var imageData: Data?
-    
-    
-    
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var authorLabel: UILabel!
-    @IBOutlet weak var imageViewAspectRatioConstraint: NSLayoutConstraint!
 }
