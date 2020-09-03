@@ -12,9 +12,9 @@ Create a new branch in the repository called `audio` or `audio/noFirebase` and w
 
 You're welcome to fulfill these instructions however you want. If you'd like suggestions on how to implement something, open the disclosure triangle and there are some suggestions for most of the instructions.
 
-### Part 1: Audio UI Prototyping
+### Part 0 (optional): Audio UI Prototyping
 
-Your first goal is to work on the audio functionality to prototype how it should behave. Building and testing with Firebase is slow, so you can speed up your development by working in issolation on this feature change.
+If you choose to, you can prototype this audio feature and the accompanying UI. If you would rather implement it in the Timeline project to begin with, skip to part 1.
 
 1. Create a new Xcode project for prototyping called `AudioComments`
 2. Create UI that allows the user to create an audio comment. 
@@ -24,7 +24,7 @@ Your first goal is to work on the audio functionality to prototype how it should
     
 For inspiration, look at how the Phone app works with Voicemail, or how the Voice Memos app works.
 
-### Part 2: Lambda Timeline Audio Integration
+### Part 1: Lambda Timeline Audio Integration
 
 Integrate your custom recording UI into the Lambda Timeline project.
 
