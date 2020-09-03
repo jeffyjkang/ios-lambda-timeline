@@ -8,7 +8,7 @@ Today you will be adding audio comments.
 
 ## Instructions
 
-Create a new branch in the repository called `audio` and work off of it from where you left off yesterday.
+Create a new branch in the repository called `audio` or `audio/noFirebase` and work off of it from where you left off yesterday.
 
 You're welcome to fulfill these instructions however you want. If you'd like suggestions on how to implement something, open the disclosure triangle and there are some suggestions for most of the instructions.
 
@@ -22,14 +22,33 @@ Your first goal is to work on the audio functionality to prototype how it should
 3. Create Table View UI that displays audio comments in a custom table view cell.
     1. The UI should allow the user to play, pause, and scrub through a recording. 
     
-    
 For inspiration, look at how the Phone app works with Voicemail, or how the Voice Memos app works.
 
 ### Part 2: Lambda Timeline Audio Integration
 
 Integrate your custom recording UI into the Lambda Timeline project.
 
-1. Users should be able to create an audio comment (in addition to a text comment).
+1. Change the `Comment` to be either a text comment or an audio comment.
+
+    <details><summary>Comment Suggestions</summary>
+    <p>
+
+    - In the `Comment` object, change the `text`'s type to be an optional string, and create a new `audioURL: URL?` variable as well. Modify the `dictionaryRepresentation` and the `init?(dictionary: ...)` to accomodate the `audioURL` and the now optional `text` string.
+
+    </p>
+    </details>
+
+2. In the `PostController`, add the ability to create a comment with the audio data that the user records, and save it to Firebase Storage, add the comment to its post, then save the post to the Firebase Database.
+
+    <details><summary>Post Controller Suggestions</summary>
+    <p>
+
+      - Create a separate function to create a comment with the audio data.
+      - You can very easily change the `store` method to instead take in data and a `StorageReference` to accomodate for storing both Post media data and now the audio data as well.
+
+    </p>
+    </details>
+3. Users should be able to create an audio comment (in addition to a text comment).
     <details><summary>Recording UI Suggestions</summary>
     <p>
 
@@ -40,28 +59,8 @@ Integrate your custom recording UI into the Lambda Timeline project.
     </p>
     </details>
     
-2. Create a new table view cell that displays at least the author of the audio comment, and a button to play the comment.
+4. Create a new table view cell that displays at least the author of the audio comment, and a button to play the comment.
 
-3. Change the `Comment` to be either a text comment or an audio comment.
-
-    <details><summary>Comment Suggestions</summary>
-    <p>
-
-    - In the `Comment` object, change the `text`'s type to be an optional string, and create a new `audioURL: URL?` variable as well. Modify the `dictionaryRepresentation` and the `init?(dictionary: ...)` to accomodate the `audioURL` and the now optional `text` string.
-
-    </p>
-    </details>
-
-4. In the `PostController`, add the ability to create a comment with the audio data that the user records, and save it to Firebase Storage, add the comment to its post, then save the post to the Firebase Database.
-
-    <details><summary>Post Controller Suggestions</summary>
-    <p>
-
-      - Create a separate function to create a comment with the audio data.
-      - You can very easily change the `store` method to instead take in data and a `StorageReference` to accomodate for storing both Post media data and now the audio data as well.
-
-    </p>
-    </details>
 5. In the `ImagePostDetailViewController`, make sure that the audio is being fetched for the audio comments. You are welcome to fetch the audio for each audio comment however you want.
 
     <details><summary>Audio Fetching Suggestions</summary>
