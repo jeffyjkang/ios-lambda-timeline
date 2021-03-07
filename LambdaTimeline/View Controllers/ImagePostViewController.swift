@@ -8,13 +8,18 @@
 
 import UIKit
 import Photos
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 class ImagePostViewController: ShiftableViewController {
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setImageViewHeight(with: 1.0)
+        
+        filterView.isHidden = true
         
         updateViews()
     }
@@ -34,6 +39,10 @@ class ImagePostViewController: ShiftableViewController {
         imageView.image = image
         
         chooseImageButton.setTitle("", for: [])
+        
+        if let _ = imageView.image {
+            filterView.isHidden = false
+        }
     }
     
     private func presentImagePickerController() {
@@ -123,6 +132,106 @@ class ImagePostViewController: ShiftableViewController {
     @IBOutlet weak var chooseImageButton: UIButton!
     @IBOutlet weak var imageHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var postButton: UIBarButtonItem!
+    
+    @IBOutlet weak var filterView: UIView!
+    
+    private let context = CIContext()
+    private let exposureFilter = CIFilter.exposureAdjust()
+    private let hueFilter = CIFilter.hueAdjust()
+    private let bloomFilter = CIFilter.bloom()
+    private let gammaFilter = CIFilter.gammaAdjust()
+    private let gloomFilter = CIFilter.gloom()
+    private let sharpenFilter = CIFilter.unsharpMask()
+    
+    // Filter Sliders
+    
+    @IBOutlet weak var exposureSlider: UISlider!
+    @IBOutlet weak var hueSlider: UISlider!
+    @IBOutlet weak var bloomSlider: UISlider!
+    @IBOutlet weak var gammaSlider: UISlider!
+    @IBOutlet weak var gloomSlider: UISlider!
+    @IBOutlet weak var sharpenSlider: UISlider!
+    
+    @IBAction func exposureChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    @IBAction func hueChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    @IBAction func bloomChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    @IBAction func gammaChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    @IBAction func gloomChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    @IBAction func sharpenChanged(_ sender: UISlider) {
+        updateImage()
+    }
+    
+    var originalImage: UIImage? {
+        didSet {
+            guard let originalImage = originalImage else {
+                scaledImage = nil
+                return
+            }
+            
+            var scaledSize = imageView.bounds.size
+            let scale = imageView.contentScaleFactor
+            scaledSize.width *= scale
+            scaledSize.height *= scale
+
+            guard let scaledUIImage = originalImage.imageByScaling(toSize: scaledSize) else {
+                scaledImage = nil
+                return
+            }
+            
+            scaledImage = CIImage(image: scaledUIImage)
+        }
+    }
+
+    var scaledImage: CIImage? {
+        didSet {
+            updateImage()
+        }
+    }
+
+    private func updateImage() {
+        if let scaledImage = scaledImage {
+            imageView.image = filterImage(byFiltering: scaledImage)
+        } else {
+            imageView.image = nil
+        }
+    }
+    
+    private func filterImage(byFiltering inputImage: CIImage) -> UIImage? {
+        exposureFilter.inputImage = inputImage
+        exposureFilter.ev = exposureSlider.value
+        
+        hueFilter.inputImage = exposureFilter.outputImage
+        hueFilter.angle = hueSlider.value
+        
+        bloomFilter.inputImage = hueFilter.outputImage
+        bloomFilter.intensity = bloomSlider.value
+        
+        gammaFilter.inputImage = bloomFilter.outputImage
+        gammaFilter.power = gammaSlider.value
+        
+        gloomFilter.inputImage = gammaFilter.outputImage
+        gloomFilter.intensity = gloomSlider.value
+        
+        sharpenFilter.inputImage = gloomFilter.outputImage
+        sharpenFilter.intensity = sharpenSlider.value
+        
+        guard let outputImage = sharpenFilter.outputImage else { return nil }
+        
+        guard let renderedCGImage = context.createCGImage(outputImage, from: inputImage.extent) else { return nil }
+        
+        return UIImage(cgImage: renderedCGImage)
+    }
+    
 }
 
 extension ImagePostViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -135,7 +244,10 @@ extension ImagePostViewController: UIImagePickerControllerDelegate, UINavigation
         
         guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
         
-        imageView.image = image
+        filterView.isHidden = false
+        
+        originalImage = image
+//        imageView.image = image
         
         setImageViewHeight(with: image.ratio)
     }
