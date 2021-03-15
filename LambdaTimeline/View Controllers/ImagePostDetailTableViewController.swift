@@ -65,21 +65,39 @@ class ImagePostDetailTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CommentCell", for: indexPath)
+        
+        
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "AudioCell", for: indexPath)
         
         let comment = post?.comments[indexPath.row + 1]
         
-        cell.textLabel?.text = comment?.text
-        cell.detailTextLabel?.text = comment?.author.displayName
         
-        return cell
+        if comment?.audioURL == nil && comment?.text != nil {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "CommentCell", for: indexPath)
+            cell.textLabel?.text = comment?.text
+            cell.detailTextLabel?.text = comment?.author.displayName
+            
+            return cell
+        } else {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "AudioCell", for: indexPath) as? AudioTableViewCell else { return UITableViewCell() }
+            cell.audioComment = comment
+            return cell
+        }
+    }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "audioSegue" {
+            let destinationVC = segue.destination as? AudioUIViewController
+            
+            destinationVC?.post = post
+            destinationVC?.postController = postController
+        }
     }
     
     var post: Post!
     var postController: PostController!
     var imageData: Data?
-    
-    
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
