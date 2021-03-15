@@ -57,9 +57,9 @@ class PostsCollectionViewController: UICollectionViewController, UICollectionVie
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let post = postController.posts[indexPath.row]
         
-        switch post.mediaType {
+//        switch post.mediaType {
             
-        case .image:
+//        case .image:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePostCell", for: indexPath) as? ImagePostCollectionViewCell else { return UICollectionViewCell() }
             
             cell.post = post
@@ -67,7 +67,9 @@ class PostsCollectionViewController: UICollectionViewController, UICollectionVie
             loadImage(for: cell, forItemAt: indexPath)
             
             return cell
-        }
+            
+        
+//        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -76,14 +78,14 @@ class PostsCollectionViewController: UICollectionViewController, UICollectionVie
         
         let post = postController.posts[indexPath.row]
         
-        switch post.mediaType {
-            
-        case .image:
+//        switch post.mediaType {
+//
+//        case .image:
             
             guard let ratio = post.ratio else { return size }
             
             size.height = size.width * ratio
-        }
+//        }
         
         return size
     }
